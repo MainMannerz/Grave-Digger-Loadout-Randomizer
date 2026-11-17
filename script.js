@@ -17,7 +17,7 @@
     { name: "Volk Scoped Rifle", category: "Primary", cost: PRIMARY_COST },
     { name: "Judgement Breech Rifle", category: "Primary", cost: PRIMARY_COST },
     { name: "Hellion Automatic Shotgun", category: "Primary", cost: PRIMARY_COST },
-
+    { name: "None", category: "Primary", cost: PRIMARY_COST },
 
     { name: "Grace Service Revolver", category: "Sidearm", cost: SIDEARM_COST },
     { name: "Union Military Pistol", category: "Sidearm", cost: SIDEARM_COST },
@@ -26,6 +26,8 @@
     { name: "Negotiator Pocket Shotgun", category: "Sidearm", cost: SIDEARM_COST },
     { name: "Knell Silenced Revolver", category: "Sidearm", cost: SIDEARM_COST },
     { name: "Auclair Lever Pistol", category: "Sidearm", cost: SIDEARM_COST },
+    { name: "None", category: "Sidearm", cost: SIDEARM_COST },
+
     { name: "Hope Automatic Pistol", category: "Sidearm", cost: SIDEARM_COST }
   ];
 
