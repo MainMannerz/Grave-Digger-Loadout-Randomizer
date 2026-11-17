@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grave/Digger Weapon Randomizer</title>
+  <meta name="description" content="Randomize a Grave/Digger loadout with Primary and Sidearm space costs.">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash of the wrong theme.
+    (function () {
+      try {
+        var saved = localStorage.getItem("theme");
+        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute("data-theme", saved || (prefersDark ? "dark" : "light"));
+      } catch (err) {}
+    })();
+  </script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top">◆ Grave/Digger Randomizer</a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav">
+        <ul>
+          <li><a href="#randomizer">Randomizer</a></li>
+          <li><a href="#how-it-works">How it works</a></li>
+        </ul>
+      </nav>
+
+      <button class="theme-toggle" aria-label="Toggle dark mode">
+        <span class="theme-icon" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="top" class="hero">
+      <div class="container">
+        <p class="eyebrow">Grave/Digger · Loadout tool</p>
+        <h1>Weapon Randomizer</h1>
+        <p class="lead">
+          Press randomize to roll a perk and two weapon slots. Each weapon spends
+          loadout space, so what fits next depends on what came before.
+        </p>
+      </div>
+    </section>
+
+    <section id="randomizer" class="section">
+      <div class="container">
+        <div class="loadout-controls">
+          <div class="controls-group">
+            <label class="switch" for="soldat-toggle">
+              <input type="checkbox" id="soldat-toggle">
+              <span class="switch-track" aria-hidden="true"></span>
+              <span class="switch-text">
+                Soldat class
+                <span class="switch-hint">+1 space</span>
+              </span>
+            </label>
+
+            <label class="switch" for="fix-perk-toggle">
+              <input type="checkbox" id="fix-perk-toggle">
+              <span class="switch-track" aria-hidden="true"></span>
+              <span class="switch-text">
+                Fix perk
+                <span class="switch-hint">stop randomizing it</span>
+              </span>
+            </label>
+
+            <label class="perk-picker" for="fixed-perk">
+              <span class="perk-picker-label">Fixed perk</span>
+              <select id="fixed-perk" disabled></select>
+            </label>
+          </div>
+
+          <div class="space-meter">
+            <span class="space-meter-label">Space</span>
+            <span class="space-pips" id="space-pips" aria-hidden="true"></span>
+            <span class="space-count" id="space-count">0 / 2 used</span>
+          </div>
+        </div>
+
+        <div class="pool-controls">
+          <details class="pool-panel" open>
+            <summary class="pool-summary">
+              <span class="pool-title">Weapon pool</span>
+              <span class="pool-count" id="weapon-pool-count"></span>
+            </summary>
+
+            <div class="pool-body">
+              <label class="pool-all" for="weapons-all">
+                <input type="checkbox" id="weapons-all">
+                <span>All weapons</span>
+              </label>
+
+              <div class="pool-group">
+                <label class="pool-group-head" for="primary-all">
+                  <input type="checkbox" id="primary-all">
+                  <span>Primary</span>
+                </label>
+                <div class="pool-list" id="primary-list"></div>
+              </div>
+
+              <div class="pool-group">
+                <label class="pool-group-head" for="sidearm-all">
+                  <input type="checkbox" id="sidearm-all">
+                  <span>Sidearm</span>
+                </label>
+                <div class="pool-list" id="sidearm-list"></div>
+              </div>
+
+              <div class="pool-group">
+                <label class="pool-group-head" for="modified-all">
+                  <input type="checkbox" id="modified-all">
+                  <span>Modified</span>
+                </label>
+                <div class="pool-list" id="modified-list"></div>
+              </div>
+            </div>
+          </details>
+
+          <details class="pool-panel" open>
+            <summary class="pool-summary">
+              <span class="pool-title">Perk pool</span>
+              <span class="pool-count" id="perk-pool-count"></span>
+            </summary>
+
+            <div class="pool-body">
+              <label class="pool-all" for="perks-all">
+                <input type="checkbox" id="perks-all">
+                <span>All perks</span>
+              </label>
+              <div class="pool-list" id="perk-list"></div>
+            </div>
+          </details>
+        </div>
+
+        <div class="loadout-grid">
+          <article class="roll-card" data-roll-card>
+            <p class="roll-label">Weapon 1</p>
+            <p class="roll-value" id="weapon-1">—</p>
+            <p class="roll-tag" id="weapon-1-tag">No roll yet</p>
+          </article>
+
+          <article class="roll-card" data-roll-card>
+            <p class="roll-label">Weapon 2</p>
+            <p class="roll-value" id="weapon-2">—</p>
+            <p class="roll-tag" id="weapon-2-tag">No roll yet</p>
+          </article>
+
+          <article class="roll-card perk-card" data-roll-card>
+            <p class="roll-label">Perk</p>
+            <p class="roll-value" id="perk">—</p>
+            <p class="roll-tag" id="perk-tag">No roll yet</p>
+          </article>
+        </div>
+
+        <div class="roll-actions">
+          <button class="button button-large" id="randomize" type="button">Randomize</button>
+        </div>
+
+        <p class="roll-status" id="roll-status" role="status" aria-live="polite">
+          Two weapon slots are filled in order using the space available.
+        </p>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="section section-alt">
+      <div class="container narrow">
+        <h2>How it works</h2>
+        <ul class="rules">
+          <li>Loadout space starts at <strong>2</strong>.</li>
+          <li>Enabling the <strong>Soldat class</strong> adds <strong>1</strong> space.</li>
+          <li>Rolling the <strong>Survivalist</strong> perk adds another <strong>1</strong> space.</li>
+          <li>Turn on <strong>Fix perk</strong> to lock in a perk of your choice instead of randomizing it. A fixed Survivalist still adds its space.</li>
+          <li><strong>Primary</strong> weapons cost <strong>2</strong> space; <strong>Sidearms</strong> cost <strong>1</strong>.</li>
+          <li>Open the <strong>Weapon pool</strong> and <strong>Perk pool</strong> panels to check or uncheck entries. <strong>All</strong> toggles a whole list, and the group boxes (<strong>Primary</strong>, <strong>Sidearm</strong>) toggle one category.</li>
+          <li>Every weapon and perk starts selected except the <strong>Hope Automatic Pistol</strong>, which you opt into. Changing a pool re-rolls the loadout so the shown result always matches your selection. Rolling with an empty pool just leaves the slots empty.</li>
+          <li><strong>Modified weapons</strong> are listed as their own <strong>Modified</strong> group in the weapon pool. They start unchecked, so tick them (or the group's <strong>All</strong> box) to add the variants to the roll.</li>
+          <li>Each roll picks a new perk first, then fills Weapon 1 and Weapon 2 in order. If a slot cannot afford any remaining weapon, it stays empty.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; <span id="year"></span> Grave/Digger Randomizer</p>
+      <p><a href="#top">Back to top</a></p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

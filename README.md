@@ -1,0 +1,84 @@
+# Grave/Digger Weapon Randomizer
+
+A dependency-free static site that rolls a random loadout for **Grave/Digger**:
+a perk plus two weapon slots limited by loadout space.
+
+## How it works
+
+**Loadout space**
+
+- Base space is **2**.
+- Enabling the **Soldat class** toggle adds **1** (3 total).
+- Rolling the **Survivalist** perk adds **1** (3 without Soldat, 4 with it).
+
+**Weapon costs**
+
+| Category | Cost | Weapons |
+| --- | --- | --- |
+| Primary | 2 space | Prince Long Rifle |
+| Sidearm | 1 space | Grace Service Revolver, Union Military Pistol |
+
+Each roll picks a perk first, then fills Weapon 1 and Weapon 2 in order. A slot only
+rolls a weapon that fits in the space remaining, so Weapon 2 depends on what Weapon 1
+cost. If nothing fits, that slot stays empty (for example, a Primary first at base
+space leaves no room for Weapon 2). Weapons do not repeat within one roll.
+
+**Pools**
+
+The **Weapon pool** and **Perk pool** panels list every entry with a checkbox. Each has an **All**
+box, weapons also have per-category boxes (**Primary**, **Sidearm**), and a box shows a dash when
+only part of its list is selected.
+
+- Everything starts selected except the **Hope Automatic Pistol**, which is opt-in.
+- Editing a pool re-rolls the loadout, so a displayed result never uses a weapon or perk you just
+  unchecked. An edit made during the animation is replayed once the roll settles.
+- Unchecking everything is allowed: the weapon slots then read "No weapon" and the perk card reads
+  "No perk".
+- The **Fixed perk** dropdown only lists perks that are currently in the pool.
+
+**Modified weapons**
+
+`MODIFIED_WEAPONS` in `script.js` is a second, separate weapon list, shown as the **Modified** group in
+the weapon pool. It has the same per-item checkboxes and group **All** box as Primary and Sidearm, but
+its entries start unchecked, so the variants only join the roll once you tick them.
+
+**Fixing the perk**
+
+Turn on **Fix perk** and choose one from the dropdown to lock it. The perk then stays
+the same across rolls instead of being randomized. A fixed **Survivalist** still adds
+its +1 space, and changing the fixed perk or toggle re-rolls the weapons so the space
+limit stays correct.
+
+## Files
+
+| File | Purpose |
+| --- | --- |
+| `index.html` | Page markup: controls, randomizer cards, how-it-works, footer |
+| `styles.css` | Design tokens, switches, pool panels, space meter, roll states, dark theme |
+| `script.js` | Weapon/perk data, space rules, randomization, roll animation, theme toggle |
+
+## Run it
+
+Open `index.html` directly in a browser, or serve the folder locally:
+
+```sh
+python3 -m http.server 8000
+# then visit http://localhost:8000
+```
+
+No install, build, or dependencies required.
+
+## Customize
+
+- **Weapon pools and costs**: edit the `WEAPONS` array at the top of `script.js`.
+- **Modified weapons**: edit the `MODIFIED_WEAPONS` array. It renders as its own `Modified` group in the
+  weapon pool; set the group's `defaultChecked` to `true` in `weaponGroups` to start those variants on.
+- **Starting pools**: the checkboxes are built from `WEAPONS` and `PERKS`; `DEFAULT_EXCLUDED_WEAPONS`
+  lists the weapons that start unchecked. `activeWeapons()` / `activePerks()` are the pools the roll
+  and the animation use.
+- **Perk pool**: edit the `PERKS` array. The `Survivalist` entry is special-cased for the +1 space bonus.
+- **Fix perk**: the dropdown is populated from `PERKS` in `script.js`; no HTML edits needed to add perks.
+- **Space rules**: adjust `BASE_SPACE`, `SOLDAT_BONUS`, and `SURVIVALIST_BONUS` in `script.js`.
+- **Roll animation speed**: adjust `totalTicks` and the `60` ms interval in `performRoll()`.
+- **Colors / spacing**: change the CSS custom properties in `:root` and `[data-theme="dark"]` in `styles.css`.
+- **Dark mode**: defaults to `prefers-color-scheme` and remembers the user's choice in `localStorage`.
